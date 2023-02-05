@@ -20,7 +20,7 @@ export const startTimer = () => {
         state.timeLeft -= 1;
         showTime(state.timeLeft);
         // document.title = state.timeLeft;
-        document.title = Math.floor(state.timeLeft / 60) + ':' + (state.timeLeft - (Math.floor(state.timeLeft / 60)) * 60);
+        document.title = addZero(Math.floor(state.timeLeft / 60)) + ':' + addZero((state.timeLeft - (Math.floor(state.timeLeft / 60)) * 60));
         if (!(state.timeLeft % 5)) {
             const now = new Date().getTime();
             state.timeLeft = Math.floor((countdown - now) / 1000);
