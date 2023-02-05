@@ -17,10 +17,12 @@ html {
 *::before,
 *::after {
   box-sizing: inherit;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  max-width: 100vw;
+  max-width:100%;
   min-width: 320px;
   min-height: 100vh;
   font-family: Lobster, sans-serif;
