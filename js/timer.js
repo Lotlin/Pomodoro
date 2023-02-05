@@ -19,11 +19,12 @@ export const startTimer = () => {
     state.timerId = setInterval(()=> {
         state.timeLeft -= 1;
         showTime(state.timeLeft);
-        document.title = state.timeLeft;
+        // document.title = state.timeLeft;
+        document.title = Math.floor(state.timeLeft / 60) + ':' + (state.timeLeft - (Math.floor(state.timeLeft / 60)) * 60);
         if (!(state.timeLeft % 5)) {
             const now = new Date().getTime();
             state.timeLeft = Math.floor((countdown - now) / 1000);
-            // console.log('синхронизация времени');
+            //console.log('синхронизация времени');
         }
         if (state.timeLeft > 0 && state.isActive)  {
             return;
