@@ -1,7 +1,8 @@
+import { changeActiveBtn, stop } from "./control.js";
 import { state } from "./state.js";
 
 const titleElem = document.querySelector('.title');
-const countPomodoro = document.querySelector('.count_num');
+const countElem = document.querySelector('.count_num');
 const toDoListElem = document.querySelector('.todo__list');
 
 const li = document.createElement('li');
@@ -16,7 +17,7 @@ const getToDo = () => {
     const toDoList = (JSON.parse(localStorage.getItem('pomodoro') || '[]'));
     return toDoList;
 }
-
+;
 const addToDo = (title) => {
     const toDo = {
         title,
@@ -25,28 +26,29 @@ const addToDo = (title) => {
     }
     const toDoList = getToDo();
     toDoList.push(toDo);
-
     localStorage.setItem('pomodoro', JSON.stringify(toDoList));
     return toDo;
-}
+};
 
-const delToDo = (id) => {
+export const updateToDO = (toDo) => {
     const toDoList = getToDo();
-    const newToDoList = [];
-
-    for (let i = 0; i < toDoList.length; i++) {
-        if (id === toDoList[i].id) {
-            delete toDoList[i];
-        } else {
-            const savedTask = JSON.parse(localStorage.getItem('pomodoro'))[i];
-            newToDoList.push(savedTask);
-        }
+    if (!toDoList.length) {
+        return;
     }
-    localStorage.removeItem('pomodoro');
+    const toDoItem = toDoList.find((item) => item.id === toDo.id);
+    toDoItem.title = toDo.title;
+    toDoItem.pomodoro = toDo.pomodoro;
+    localStorage.setItem('pomodoro', JSON.stringify(toDoList));
+};
+
+const deleteToDo = (toDo) => {
+    const toDoList = getToDo();
+    const newToDoList = toDoList.filter((item) => item.id !== toDo.id);
+    if (toDo.id === state.activeToDo.id) {
+        state.activeToDo = newToDoList[newToDoList.length - 1];
+    }
     localStorage.setItem('pomodoro', JSON.stringify(newToDoList));
-    const changedToDoList = (JSON.parse(localStorage.getItem('pomodoro')));
-    return renderToDoList(changedToDoList);
-}
+};
 
 const createToDoListItem = (toDo) => { 
     if (toDo.id !== 'default') {
@@ -75,56 +77,71 @@ const createToDoListItem = (toDo) => {
         toDoListElem.prepend(toDoItem);
 
         toDoBtn.addEventListener('click', () => {
-            state.activeToDo.title = toDoBtn.textContent;
+            state.activeToDo = toDo;
             showToDO();
+            changeActiveBtn('work');
+            stop();
         })
+        
         editBtn.addEventListener('click', () => {
-            const title = prompt('Введите новое название задачи');
-            const toDo = addToDo(title);
+            toDo.title = prompt('Введите новое название задачи', toDo.title);
             toDoBtn.textContent = toDo.title;
-        })
+            if (toDo.id === state.activeToDo.id) {
+                state.activeToDo.title = toDo.title;
+            }
+            showToDO();
+            updateToDO(toDo);
+        });
+        
         delBtn.addEventListener('click', () => {
-            const id = toDo.id;
-            delToDo(id);
-        })
+            deleteToDo(toDo);
+            showToDO();
+            toDoItem.remove();
+        });
     }
-}
+};
 
 
 const renderToDoList = (list) => {
     toDoListElem.textContent = '';
     list.forEach(createToDoListItem);
     toDoListElem.append(li);
-}
+};
 
-const showToDO = () => {
-    titleElem.textContent = state.activeToDo.title;
-}
-
-const showCountPomodoro = () => {
-    countPomodoro.textContent = state.activeToDo.pomodoro;
-}
+export const showToDO = () => {
+    if (state.activeToDo) {
+        titleElem.textContent = state.activeToDo.title;
+        countElem.textContent = state.activeToDo.pomodoro;
+    } else {
+        titleElem.textContent = '';
+        countElem.textContent = 0;
+    }
+};
 
 export const initToDo = () => {
     const toDoList = getToDo();
 
     if (!toDoList.length) {
-        state.activeToDo = [{
+        state.activeToDo = {
             id: 'default',
             pomodoro: 0,
-            title: 'Помодоро',
-        }]
+            title: 'Нет задач',
+        };
     } else {
         state.activeToDo = toDoList[toDoList.length - 1];
     }
 
     showToDO();
-    showCountPomodoro();
     renderToDoList(toDoList);
 
     toDoAddBtn.addEventListener('click', () => {
         const title = prompt('Введите название задачи');
         const toDo = addToDo(title);
         createToDoListItem(toDo);
+        /*
+        есди нужно сделать добавляемую задачу активной
+        state.activeToDo = toDo;
+        showToDO();
+        */
     })
 }

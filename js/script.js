@@ -3,7 +3,7 @@ import { state } from "./state.js";
 import { initToDo } from "./toDo.js";
 
 const initPomodoro = () => {
-    // initControl();
+    initControl();
     initToDo();
 
 
